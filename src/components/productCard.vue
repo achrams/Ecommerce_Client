@@ -48,9 +48,13 @@ export default {
                 })
                 .then(({ data }) => {
                     if(data.data.balance >= this.product.price)   {
-                        this.$store.dispatch('watchmovie',id)
-                        .then((result)=>{
-                        this.$router.push('watch')
+                        let total = data.data.balance - this.product.price
+                        this.$store.dispatch('addbalance',total)
+                        .then((data)=>{
+                            this.$store.dispatch('watchmovie',id)
+                            .then((result)=>{
+                            this.$router.push('watch')
+                            })
                         })
                     } else {
                         console.log('duit kurang')
