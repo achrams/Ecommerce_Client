@@ -1,23 +1,50 @@
 <template>
   <div class="home">
     <Homepage />
-    <Loginform />
-    <Registerform />
+    <div id="navpanel">
+            <div id="panelbutton">
+                <button @click="logout" >Log Out</button>
+            </div>
+    </div>
+    <productlist />
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
 import Homepage from '@/components/homepage.vue'
-import Loginform from '@/components/loginform.vue'
-import Registerform from '@/components/registerform.vue'
+import productlist from '@/components/list.vue'
 
 export default {
   name: 'Home',
   components: {
     Homepage,
-    Loginform,
-    Registerform
+    productlist
+  },
+  methods: {
+      logout () {
+          localStorage.clear()
+          this.$router.push('/')
+      }
+  },
+  created () {
+      if(!localStorage.access_token){
+          this.$router.push('/')
+      } else{
+          if (localStorage.isAdmin) {
+          this.$router.push('controlpanel')
+          }
+      }
   }
 }
 </script>
+<style scoped>
+#navpanel{
+    width: 100%;
+    display: flex;
+    height: 75px;
+    justify-content: center;
+}
+#panelbutton{
+    position: fixed;
+}
+</style>
