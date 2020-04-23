@@ -1,192 +1,168 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
+
 Vue.use(Vuex)
 
-const store = new Vuex.Store({
+export default new Vuex.Store({
     state: {
-        products: {}
+        products: [],
+        item: {},
+        isAdd: false,
+        isEdit: false
     },
     mutations: {
         SET_PRODUCTS(state, payload) {
             state.products = payload
+        },
+        SET_ISADD(state, payload) {
+            state.isAdd = payload
+        },
+        SET_ISEDIT(state, payload) {
+            state.isEdit = payload
+        },
+        SET_ITEM(state, payload) {
+            state.item = payload
         }
     },
     actions: {
+        adding(context) {
+            context.commit('SET_ISADD', true)
+        },
+        editing(context, payload) {
+            context.commit('SET_ISEDIT', true)
+            context.commit('SET_ITEM', payload)
+            console.log(payload);
+        },
+        cancel(context) {
+            context.commit('SET_ISADD', false)
+            context.commit('SET_ISEDIT', false)
+        },
         login(context, payload) {
             return new Promise((resolve, reject) => {
-                axios({
+                const email = payload.email
+                const password = payload.password
+                return axios({
                         method: 'POST',
-                        url: 'http://localhost:3000/admin/login',
+                        url: 'https://thawing-ocean-38020.herokuapp.com/admin/login',
                         data: {
-                            email: payload.email,
-                            password: payload.password
+                            email,
+                            password
                         }
                     })
-                    .then(({ data }) => {
-                        resolve(data)
-                    })
-                    .catch(err => {
-                        reject(err)
-                    })
-            })
-        },
-        userlogin(context, payload) {
-            return new Promise((resolve, reject) => {
-                axios({
-                        method: 'POST',
-                        url: 'http://localhost:3000/user/login',
-                        data: {
-                            email: payload.email,
-                            password: payload.password
-                        }
-                    })
-                    .then(({ data }) => {
-                        resolve(data)
-                    })
-                    .catch(err => {
-                        reject(err)
-                    })
-            })
-        },
-        addProduct(_, payload) {
-            return new Promise((resolve, reject) => {
-                console.log('payload :' + payload.name)
-                axios({
-                        method: 'POST',
-                        url: 'http://localhost:3000/admin/addproduct',
-                        headers: {
-                            access_token: localStorage.access_token
-                        },
-                        data: {
-                            name: payload.name,
-                            image: payload.image,
-                            description: payload.description,
-                            videourl: payload.videourl,
-                            price: payload.price
-                        }
-                    })
-                    .then(({ data }) => {
-                        resolve(data)
-                    })
-                    .catch(err => {
-                        reject(err)
-                    })
-            })
-        },
-        findAll(context, payload) {
-            return new Promise((resolve, reject) => {
-                console.log('masuk')
-                axios({
-                        method: 'GET',
-                        url: 'http://localhost:3000/product/list',
-                        headers: {
-                            access_token: localStorage.access_token
-                        }
-                    })
-                    .then(({ data }) => {
-                        console.log(data)
-                        context.commit('SET_PRODUCTS', data.data)
-                            // console.log(data.Product)
-                        this.products = data.data
-                            // this.task= data.Task
-                    })
-                    .catch(err => {
-                        console.log(err)
-                    })
-            })
-        },
-        editPage(context, payload) {
-            return new Promise((resolve, reject) => {
-                axios({
-                        method: 'GET',
-                        url: 'http://localhost:3000/product/list/' + payload,
-                        headers: {
-                            access_token: localStorage.access_token
-                        }
-                    })
-                    .then(({ data }) => {
-                        console.log(data)
-                        context.commit('SET_PRODUCTS', data.data)
-                        resolve(data)
-                    })
-                    .catch(err => {
-                        console.log(err)
-                        reject(err)
-                    })
-            })
-        },
-        watchmovie(context, id) {
-            return new Promise((resolve, reject) => {
-                console.log(id)
-                axios({
-                        method: 'GET',
-                        url: 'http://localhost:3000/product/list/' + id,
-                        headers: {
-                            access_token: localStorage.access_token
-                        }
-                    })
-                    .then(({ data }) => {
-                        this.products = ''
-                        console.log(data)
-                        context.commit('SET_PRODUCTS', data.data)
-                        this.products = data.data
-                        console.log('thisproduct : ' + this.products)
+                    .then((data) => {
                         resolve(data.data)
                     })
-                    .catch(err => {
-                        console.log(err)
+                    .catch((err) => {
+                        reject(err)
                     })
             })
+
         },
-        edit(_, payload) {
+        logout() {
+            localStorage.clear()
+        },
+        fetchProducts(context, payload) {
+            axios({
+                    method: 'GET',
+                    url: 'https://thawing-ocean-38020.herokuapp.com/products',
+                    headers: {
+                        access_token: localStorage.getItem('access_token')
+                    }
+                })
+                .then(({ data }) => {
+                    context.commit('SET_PRODUCTS', data.data)
+                })
+                .catch((err) => {
+                    console.log(error)
+                })
+        },
+        addProduct(context, payload) {
             return new Promise((resolve, reject) => {
                 axios({
-                        method: 'PUT',
-                        url: 'http://localhost:3000/admin/edit/' + payload.id,
+                        method: 'POST',
+                        url: 'https://thawing-ocean-38020.herokuapp.com/products',
                         headers: {
-                            access_token: localStorage.access_token
+                            access_token: localStorage.getItem('access_token')
                         },
                         data: {
                             name: payload.name,
-                            image: payload.image,
-                            videourl: payload.videourl,
                             description: payload.description,
-                            price: payload.price
+                            stock: payload.stock,
+                            price: payload.price,
+                            image: payload.image
                         }
                     })
                     .then(({ data }) => {
                         resolve(data)
                     })
-                    .catch(err => {
+                    .catch((err) => {
                         reject(err)
                     })
             })
         },
-        addbalance(context, payload) {
+        editProduct(context, payload) {
             return new Promise((resolve, reject) => {
-                console.log(payload)
                 axios({
                         method: 'PUT',
-                        url: 'http://localhost:3000/user',
+                        url: 'https://thawing-ocean-38020.herokuapp.com/products/edit/' + payload.id,
                         headers: {
-                            access_token: localStorage.access_token
+                            access_token: localStorage.getItem('access_token')
                         },
                         data: {
-                            balance: +payload
+                            name: payload.name,
+                            description: payload.description,
+                            stock: payload.stock,
+                            price: payload.price,
+                            image: payload.image
                         }
                     })
                     .then(({ data }) => {
-                        console.log('sukses nambah duit')
                         resolve(data)
                     })
-                    .catch(err => {
-                        console.log(err)
+                    .catch((err) => {
+                        reject(err)
+                    })
+            })
+        },
+        fetchProductById(context, payload) {
+            return new Promise((resolve, reject) => {
+                axios({
+                        method: 'GET',
+                        url: 'https://thawing-ocean-38020.herokuapp.com/products/' + payload,
+                        headers: {
+                            access_token: localStorage.getItem('access_token')
+                        }
+                    })
+                    .then(({ data }) => {
+                        context.commit('SET_ITEM', data.data)
+                        resolve(data.data)
+                            // console.log(this.state.item);
+                    })
+                    .catch((err) => {
+                        console.log(error)
+                        reject(err)
+                    })
+            })
+        },
+        deleting(context, payload) {
+            console.log('deleting on progress...')
+            return new Promise((resolve, reject) => {
+                axios({
+                        method: 'DELETE',
+                        url: 'https://thawing-ocean-38020.herokuapp.com/products/delete/' + payload,
+                        headers: {
+                            access_token: localStorage.getItem('access_token')
+                        }
+                    })
+                    .then(({ data }) => {
+                        resolve(data)
+                    })
+                    .catch((err) => {
                         reject(err)
                     })
             })
         }
-    }
+    },
+    modules: {}
 })
-
-export default store

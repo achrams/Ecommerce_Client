@@ -1,48 +1,28 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Landing from '../views/Landing.vue'
 import Home from '../views/Home.vue'
-import AdminLogin from '../views/AdminLogin.vue'
-import admincpanel from '../views/admincpanel.vue'
-import editpage from '../views/editpage.vue'
-import watch from '../views/watch.vue'
+import Login from '../views/Login.vue'
 Vue.use(VueRouter)
 
 const routes = [{
         path: '/',
-        name: 'Landing',
-        component: Landing
-    },
-    {
-        path: '/home',
         name: 'Home',
         component: Home
     },
     {
-        path: '/admin',
-        name: 'Admin',
-        component: AdminLogin
-    },
-    {
-        path: '/controlpanel',
-        name: 'admincpanel',
-        component: admincpanel
-    },
-    {
-        path: '/editpage',
-        name: 'editpage',
-        component: editpage
-    },
-    {
-        path: '/watch',
-        name: 'watch',
-        component: watch
+        path: '/login',
+        name: 'Login',
+        // route level code-splitting
+        // this generates a separate chunk (about.[hash].js) for this route
+        // which is lazy-loaded when the route is visited.
+        component: Login
     }
 ]
 
 const router = new VueRouter({
-    routes,
-    mode: 'history'
+    mode: 'history',
+    base: process.env.BASE_URL,
+    routes
 })
 
 export default router
